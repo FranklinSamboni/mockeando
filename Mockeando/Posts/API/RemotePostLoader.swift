@@ -17,7 +17,9 @@ public class RemotePostLoader: PostLoader {
     }
     
     public func load(completion: @escaping (Result<[Post], Error>) -> Void) {
-        httpClient.get(from: url) { data, error in
+        httpClient.get(from: url) { [weak self] data, error in
+            guard let self = self else { return }
+            
             if let error = error {
                 completion(.failure(error))
             } else {

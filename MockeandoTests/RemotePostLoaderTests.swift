@@ -101,9 +101,15 @@ final class RemotePostLoaderTests: XCTestCase {
     }
     
     // MARK: Helpers
-    private func makeSUT(url: URL) -> (PostLoader, HTTPClientSpy) {
+    private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (PostLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
+        
+        addTeardownBlock { [weak sut, weak httpClienSpy] in
+            XCTAssertNil(sut, "Instance should have been dellocated, potential memory leak", file: file, line: line)
+            XCTAssertNil(httpClienSpy, "Instance should have been dellocated, potential memory leak", file: file, line: line)
+        }
+        
         return (sut, httpClienSpy)
     }
     
