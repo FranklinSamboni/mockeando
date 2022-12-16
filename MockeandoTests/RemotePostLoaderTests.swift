@@ -105,10 +105,8 @@ final class RemotePostLoaderTests: XCTestCase {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
         
-        addTeardownBlock { [weak sut, weak httpClienSpy] in
-            XCTAssertNil(sut, "Instance should have been dellocated, potential memory leak", file: file, line: line)
-            XCTAssertNil(httpClienSpy, "Instance should have been dellocated, potential memory leak", file: file, line: line)
-        }
+        trackForMemoryLeak(sut, file: file, line: line)
+        trackForMemoryLeak(httpClienSpy, file: file, line: line)
         
         return (sut, httpClienSpy)
     }
@@ -146,6 +144,12 @@ final class RemotePostLoaderTests: XCTestCase {
         
         wait(for: [exp], timeout: 0.5)
         return receivedResponse
+    }
+    
+    private func trackForMemoryLeak(_ instance: AnyObject, file: StaticString = #filePath, line: UInt = #line) {
+        addTeardownBlock { [weak instance] in
+            XCTAssertNil(instance, "Instance should have been dellocated, potential memory leak", file: file, line: line)
+        }
     }
     
     private class HTTPClientSpy: HTTPClient {
