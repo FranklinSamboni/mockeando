@@ -20,6 +20,8 @@ public class RemotePostLoader: PostLoader {
         httpClient.get(from: url) { data, error in
             if let error = error {
                 completion(.failure(error))
+            } else {
+                completion(.success([]))
             }
         }
     }

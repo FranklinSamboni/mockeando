@@ -21,11 +21,13 @@ final class RemotePostLoaderTests: XCTestCase {
         let (sut, httpClientSpy) = makeSUT(url: expectedURL)
 
         sut.load { _ in }
+        sut.load { _ in }
+        sut.load { _ in }
         
-        XCTAssertEqual(httpClientSpy.receivedURLs, [expectedURL])
+        XCTAssertEqual(httpClientSpy.receivedURLs, [expectedURL, expectedURL, expectedURL])
     }
     
-    func test_load_completesWithErrorOnError() {
+    func test_load_completesWithErrorOnClientError() {
         let expectedError = NSError(domain: "an error", code: 0)
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
 
@@ -40,9 +42,30 @@ final class RemotePostLoaderTests: XCTestCase {
             exp.fulfill()
         }
         
-        httpClientSpy.completions[0](nil, expectedError)
+        httpClientSpy.completeLoad(with: expectedError)
         
-        wait(for: [exp], timeout: 1.0)
+        wait(for: [exp], timeout: 0.5)
+    }
+    
+    func test_load_completesWithEmptyOnEmptyDataResponse() {
+        let emptyPosts = [Post]()
+        let (sut, httpClientSpy) = makeSUT(url: anyURL())
+        
+        let exp = expectation(description: "wait for completion")
+        sut.load { response in
+            switch response {
+            case .success(let receivedPosts):
+                XCTAssertTrue(receivedPosts.isEmpty)
+            case .failure:
+                XCTFail("Expected success got \(response) instead")
+            }
+            exp.fulfill()
+        }
+        
+        let data = try! JSONSerialization.data(withJSONObject: emptyPosts)
+        httpClientSpy.completeLoad(with: data)
+        
+        wait(for: [exp], timeout: 0.5)
     }
     
     // MARK: Helpers
@@ -56,13 +79,23 @@ final class RemotePostLoaderTests: XCTestCase {
         URL(string: "any-url.com")!
     }
     
-    class HTTPClientSpy: HTTPClient {
+    private class HTTPClientSpy: HTTPClient {
         var receivedURLs: [URL] = []
         var completions: [(Data?, Error?) -> Void] = []
 
         func get(from url: URL, completion: @escaping (Data?, Error?) -> Void) {
             receivedURLs.append(url)
             completions.append(completion)
+        }
+        
+        // MARK: Helpers
+        
+        func completeLoad(with error: NSError, at index: Int = 0) {
+            completions[index](nil, error)
+        }
+        
+        func completeLoad(with data: Data, at index: Int = 0) {
+            completions[index](data, nil)
         }
     }
     
