@@ -12,7 +12,7 @@
 		27C6B110294C164200A8C3B4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B10F294C164200A8C3B4 /* ViewController.swift */; };
 		27C6B115294C164400A8C3B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27C6B114294C164400A8C3B4 /* Assets.xcassets */; };
 		27C6B118294C164400A8C3B4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 27C6B116294C164400A8C3B4 /* LaunchScreen.storyboard */; };
-		27C6B123294C164400A8C3B4 /* MockeandoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B122294C164400A8C3B4 /* MockeandoTests.swift */; };
+		27C6B13C294C189F00A8C3B4 /* PostLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B13B294C189F00A8C3B4 /* PostLoaderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 		27C6B117294C164400A8C3B4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		27C6B119294C164400A8C3B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		27C6B11E294C164400A8C3B4 /* MockeandoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MockeandoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		27C6B122294C164400A8C3B4 /* MockeandoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockeandoTests.swift; sourceTree = "<group>"; };
+		27C6B13B294C189F00A8C3B4 /* PostLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostLoaderTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,7 +89,7 @@
 		27C6B121294C164400A8C3B4 /* MockeandoTests */ = {
 			isa = PBXGroup;
 			children = (
-				27C6B122294C164400A8C3B4 /* MockeandoTests.swift */,
+				27C6B13B294C189F00A8C3B4 /* PostLoaderTests.swift */,
 			);
 			path = MockeandoTests;
 			sourceTree = "<group>";
@@ -204,7 +204,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				27C6B123294C164400A8C3B4 /* MockeandoTests.swift in Sources */,
+				27C6B13C294C189F00A8C3B4 /* PostLoaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
