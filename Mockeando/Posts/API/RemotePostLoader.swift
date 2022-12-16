@@ -17,18 +17,20 @@ public class RemotePostLoader: PostLoader {
     }
     
     public func load(completion: @escaping (Result<[Post], Error>) -> Void) {
-        httpClient.get(from: url) { [weak self] data, error in
+        httpClient.get(from: url) { [weak self] response in
             guard let self = self else { return }
             
-            if let error = error {
-                completion(.failure(error))
-            } else {
+            switch response {
+            case let .success(data):
                 do {
-                    let decoded = try JSONDecoder().decode([Payload].self, from: data ?? Data())
-                    completion(.success(self.map(payload: decoded)))
+                    let decoded = try JSONDecoder().decode([Payload].self, from: data)
+                    let posts = self.map(payload: decoded)
+                    completion(.success(posts))
                 } catch {
                     completion(.failure(LoaderError.invalidData))
                 }
+            case let .failure(error):
+                completion(.failure(error))
             }
         }
     }

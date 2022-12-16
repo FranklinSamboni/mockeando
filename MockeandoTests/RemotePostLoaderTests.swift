@@ -153,21 +153,22 @@ final class RemotePostLoaderTests: XCTestCase {
     }
     
     private class HTTPClientSpy: HTTPClient {
-        var receivedURLs: [URL] = []
-        var completions: [(Data?, Error?) -> Void] = []
 
-        func get(from url: URL, completion: @escaping (Data?, Error?) -> Void) {
+        var receivedURLs: [URL] = []
+        var completions: [(HTTPClient.Response) -> Void] = []
+
+        func get(from url: URL, completion: @escaping (Response) -> Void) {
             receivedURLs.append(url)
             completions.append(completion)
         }
         
         // MARK: Helpers
         func completeLoad(with error: NSError, at index: Int = 0) {
-            completions[index](nil, error)
+            completions[index](.failure(error))
         }
         
         func completeLoad(with data: Data, at index: Int = 0) {
-            completions[index](data, nil)
+            completions[index](.success(data))
         }
     }
     
