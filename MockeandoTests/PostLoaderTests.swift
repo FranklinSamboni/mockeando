@@ -8,6 +8,6 @@
 import XCTest
 import Mockeando
 
-final class MockeandoTests: XCTestCase {
+final class PostLoaderTests: XCTestCase {
     
 }
