@@ -16,7 +16,7 @@ struct Post {
 }
 
 protocol HTTPClient {
-    func get(from url: URL)
+    func get(from url: URL, completion: @escaping (Data?, Error?) -> Void)
 }
 
 class RemotePostLoader {
@@ -28,40 +28,70 @@ class RemotePostLoader {
         self.url = url
     }
     
-    func load() {
-        httpClient.get(from: url)
+    func load(completion: @escaping (Result<[Post], Error>) -> Void) {
+        httpClient.get(from: url) { data, error in
+            if let error = error {
+                completion(.failure(error))
+            }
+        }
     }
 }
 
 final class RemotePostLoaderTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
-        let (_, httpClienSpy) = makeSUT()
+        let (_, httpClientSpy) = makeSUT(url: anyURL())
         
-        XCTAssertEqual(httpClienSpy.receivedURLs, [])
+        XCTAssertEqual(httpClientSpy.receivedURLs, [])
     }
     
     func test_load_requestDataFromURL() {
-        let expectedURL = URL(string: "any-url.com")!
-        let (sut, httpClienSpy) = makeSUT(url: expectedURL)
+        let expectedURL = anyURL()
+        let (sut, httpClientSpy) = makeSUT(url: expectedURL)
 
-        sut.load()
+        sut.load { _ in }
         
-        XCTAssertEqual(httpClienSpy.receivedURLs, [expectedURL])
+        XCTAssertEqual(httpClientSpy.receivedURLs, [expectedURL])
+    }
+    
+    func test_load_completesWithErrorOnError() {
+        let expectedError = NSError(domain: "an error", code: 0)
+        let (sut, httpClientSpy) = makeSUT(url: anyURL())
+
+        let exp = expectation(description: "wait for completion")
+        sut.load { response in
+            switch response {
+            case .success:
+                XCTFail("Expected failure got \(response) instead")
+            case .failure(let receivedError):
+                XCTAssertEqual(receivedError as NSError, expectedError)
+            }
+            exp.fulfill()
+        }
+        
+        httpClientSpy.completions[0](nil, expectedError)
+        
+        wait(for: [exp], timeout: 1.0)
     }
     
     // MARK: Helpers
-    private func makeSUT(url: URL = URL(string: "any-url.com")!) -> (RemotePostLoader, HTTPClientSpy) {
+    private func makeSUT(url: URL) -> (RemotePostLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
         return (sut, httpClienSpy)
     }
     
+    private func anyURL() -> URL {
+        URL(string: "any-url.com")!
+    }
+    
     class HTTPClientSpy: HTTPClient {
         var receivedURLs: [URL] = []
-        
-        func get(from url: URL) {
+        var completions: [(Data?, Error?) -> Void] = []
+
+        func get(from url: URL, completion: @escaping (Data?, Error?) -> Void) {
             receivedURLs.append(url)
+            completions.append(completion)
         }
     }
     
