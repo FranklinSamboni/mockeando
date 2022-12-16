@@ -8,41 +8,6 @@
 import XCTest
 import Mockeando
 
-struct Post {
-    let userId: Int
-    let id: Int
-    let title: String
-    let body: String
-}
-
-protocol PostLoader {
-    typealias Response = Result<[Post], Error>
-    
-    func load(completion: @escaping (Response) -> Void)
-}
-
-protocol HTTPClient {
-    func get(from url: URL, completion: @escaping (Data?, Error?) -> Void)
-}
-
-class RemotePostLoader: PostLoader {
-    private let httpClient: HTTPClient
-    private let url: URL
-    
-    init(httpClient: HTTPClient, url: URL) {
-        self.httpClient = httpClient
-        self.url = url
-    }
-    
-    func load(completion: @escaping (Result<[Post], Error>) -> Void) {
-        httpClient.get(from: url) { data, error in
-            if let error = error {
-                completion(.failure(error))
-            }
-        }
-    }
-}
-
 final class RemotePostLoaderTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
