@@ -15,6 +15,12 @@ struct Post {
     let body: String
 }
 
+protocol PostLoader {
+    typealias Response = Result<[Post], Error>
+    
+    func load(completion: @escaping (Response) -> Void)
+}
+
 protocol HTTPClient {
     func get(from url: URL, completion: @escaping (Data?, Error?) -> Void)
 }
