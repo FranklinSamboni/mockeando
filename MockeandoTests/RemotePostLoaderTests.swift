@@ -36,31 +36,32 @@ class RemotePostLoader {
 final class RemotePostLoaderTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
-        let httpClienSpy = HTTPClientSpy()
-        let _ = RemotePostLoader(httpClient: httpClienSpy, url: URL(string: "any-url.com")!)
+        let (_, httpClienSpy) = makeSUT()
         
-        XCTAssertEqual(httpClienSpy.getCallCount, 0)
+        XCTAssertEqual(httpClienSpy.receivedURLs, [])
     }
     
     func test_load_requestDataFromURL() {
-        let httpClienSpy = HTTPClientSpy()
         let expectedURL = URL(string: "any-url.com")!
-        let sut = RemotePostLoader(httpClient: httpClienSpy, url: expectedURL)
-        
+        let (sut, httpClienSpy) = makeSUT(url: expectedURL)
+
         sut.load()
         
-        XCTAssertEqual(httpClienSpy.getCallCount, 1)
-        XCTAssertEqual(httpClienSpy.receivedURL, expectedURL)
+        XCTAssertEqual(httpClienSpy.receivedURLs, [expectedURL])
     }
     
     // MARK: Helpers
+    private func makeSUT(url: URL = URL(string: "any-url.com")!) -> (RemotePostLoader, HTTPClientSpy) {
+        let httpClienSpy = HTTPClientSpy()
+        let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
+        return (sut, httpClienSpy)
+    }
+    
     class HTTPClientSpy: HTTPClient {
-        var getCallCount = 0
-        var receivedURL: URL!
+        var receivedURLs: [URL] = []
         
         func get(from url: URL) {
-            getCallCount += 1
-            receivedURL = url
+            receivedURLs.append(url)
         }
     }
     
