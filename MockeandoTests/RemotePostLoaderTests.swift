@@ -25,7 +25,7 @@ protocol HTTPClient {
     func get(from url: URL, completion: @escaping (Data?, Error?) -> Void)
 }
 
-class RemotePostLoader {
+class RemotePostLoader: PostLoader {
     private let httpClient: HTTPClient
     private let url: URL
     
@@ -81,7 +81,7 @@ final class RemotePostLoaderTests: XCTestCase {
     }
     
     // MARK: Helpers
-    private func makeSUT(url: URL) -> (RemotePostLoader, HTTPClientSpy) {
+    private func makeSUT(url: URL) -> (PostLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
         return (sut, httpClienSpy)
