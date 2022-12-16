@@ -18,6 +18,7 @@
 		27C6B147294C2BF000A8C3B4 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B146294C2BF000A8C3B4 /* HTTPClient.swift */; };
 		27C6B149294C2C0C00A8C3B4 /* RemotePostLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B148294C2C0C00A8C3B4 /* RemotePostLoader.swift */; };
 		27C6B14E294C4D2600A8C3B4 /* URLSessionHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B14D294C4D2600A8C3B4 /* URLSessionHTTPClient.swift */; };
+		27C6B150294C57D800A8C3B4 /* URLSessionHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27C6B14F294C57D800A8C3B4 /* URLSessionHTTPClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		27C6B146294C2BF000A8C3B4 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		27C6B148294C2C0C00A8C3B4 /* RemotePostLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePostLoader.swift; sourceTree = "<group>"; };
 		27C6B14D294C4D2600A8C3B4 /* URLSessionHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClient.swift; sourceTree = "<group>"; };
+		27C6B14F294C57D800A8C3B4 /* URLSessionHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionHTTPClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +149,7 @@
 		27C6B14B294C4CFE00A8C3B4 /* Infraestructure */ = {
 			isa = PBXGroup;
 			children = (
+				27C6B14F294C57D800A8C3B4 /* URLSessionHTTPClient.swift */,
 			);
 			path = Infraestructure;
 			sourceTree = "<group>";
@@ -262,6 +265,7 @@
 				27C6B142294C2B9800A8C3B4 /* PostLoader.swift in Sources */,
 				27C6B149294C2C0C00A8C3B4 /* RemotePostLoader.swift in Sources */,
 				27C6B110294C164200A8C3B4 /* ViewController.swift in Sources */,
+				27C6B150294C57D800A8C3B4 /* URLSessionHTTPClient.swift in Sources */,
 				27C6B147294C2BF000A8C3B4 /* HTTPClient.swift in Sources */,
 				27C6B10C294C164200A8C3B4 /* AppDelegate.swift in Sources */,
 				27C6B10E294C164200A8C3B4 /* SceneDelegate.swift in Sources */,

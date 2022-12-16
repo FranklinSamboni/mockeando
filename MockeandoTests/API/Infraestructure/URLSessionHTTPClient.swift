@@ -8,29 +8,6 @@
 import XCTest
 import Mockeando
 
-class URLSessionHTTPClient: HTTPClient {
-
-    let session: URLSession
-    
-    init(session: URLSession) {
-        self.session = session
-    }
-    
-    func get(from url: URL, completion: @escaping (Response) -> Void) {
-        let dataTask = session.dataTask(with: URLRequest(url: url)) { data, urlResponse, error in
-            if let error = error {
-                completion(.failure(error))
-            } else if let data = data, urlResponse != nil {
-                completion(.success(data))
-            } else {
-                completion(.failure(NSError(domain: "Unexpected Error", code: -1)))
-            }
-        }
-        
-        dataTask.resume()
-    }
-}
-
 final class URLSessionHTTPClientTests: XCTestCase {
     
     override class func tearDown() {
@@ -39,6 +16,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_get_failsOnRepresentationError() {
+        URLProtocolStub.stub = nil
         let sut = makeSUT()
         
         let exp = expectation(description: "wait for completion")
@@ -90,7 +68,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
     
     // MARK: Helpers
     private func makeSUT() -> URLSessionHTTPClient {
-        let config = URLSessionConfiguration.default
+        let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [URLProtocolStub.self]
         let urlSession = URLSession(configuration: config)
         let sut = URLSessionHTTPClient(session: urlSession)
@@ -100,7 +78,13 @@ final class URLSessionHTTPClientTests: XCTestCase {
     
     private class URLProtocolStub: URLProtocol {
         
-        static var stub: HTTPClient.Response?
+        private static var _stub: HTTPClient.Response?
+        static var stub: HTTPClient.Response? {
+            get { return queue.sync { _stub } }
+            set { queue.sync { _stub = newValue } }
+        }
+        
+        private static let queue = DispatchQueue(label: "URLProtocolStub.queue")
         
         override class func canInit(with request: URLRequest) -> Bool {
             return true
@@ -111,7 +95,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         }
         
         override func startLoading() {
-            if let stub = Self.stub {
+            if let stub = Self._stub {
                 switch stub {
                 case let .failure(error):
                     client?.urlProtocol(self, didFailWithError: error)
