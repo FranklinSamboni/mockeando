@@ -25,7 +25,7 @@ public class RemotePostLoader: PostLoader {
                     let decoded = try JSONDecoder().decode([Payload].self, from: data ?? Data())
                     completion(.success(self.map(payload: decoded)))
                 } catch {
-                    
+                    completion(.failure(LoaderError.invalidData))
                 }
             }
         }
@@ -43,5 +43,9 @@ public class RemotePostLoader: PostLoader {
         let id: Int
         let title: String
         let body: String
+    }
+    
+    public enum LoaderError: Error {
+        case invalidData
     }
 }

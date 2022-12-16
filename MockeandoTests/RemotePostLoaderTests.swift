@@ -47,6 +47,27 @@ final class RemotePostLoaderTests: XCTestCase {
         wait(for: [exp], timeout: 0.5)
     }
     
+    func test_load_completesWithErrorOnInvalidData() {
+        let invalidJSON = Data("Invalid JSON".utf8)
+        let expectedError = RemotePostLoader.LoaderError.invalidData
+        let (sut, httpClientSpy) = makeSUT(url: anyURL())
+        
+        let exp = expectation(description: "wait for completion")
+        sut.load { response in
+            switch response {
+            case .success:
+                XCTFail("Expected failure got \(response) instead")
+            case let .failure(receivedError):
+                XCTAssertEqual(receivedError as! RemotePostLoader.LoaderError, expectedError)
+            }
+            exp.fulfill()
+        }
+        
+        httpClientSpy.completeLoad(with: invalidJSON)
+        
+        wait(for: [exp], timeout: 0.5)
+    }
+    
     func test_load_completesWithEmptyOnEmptyDataResponse() {
         let emptyPosts = Data("[]".utf8)
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
