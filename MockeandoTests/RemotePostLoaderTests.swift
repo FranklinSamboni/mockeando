@@ -68,21 +68,14 @@ final class RemotePostLoaderTests: XCTestCase {
     
     func test_load_completesWithEmptyOnEmptyDataResponse() {
         // Given
-        let emptyPosts = Data("[]".utf8)
+        let emptyData = Data("[]".utf8)
+        let expectedEmptyPosts = [Post]()
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
         
-        // When
-        let receivedResponse = loadResponseFor(sut, when: {
-            httpClientSpy.completeLoad(with: emptyPosts)
-        })
-        
         // Then
-        switch receivedResponse {
-        case .success(let receivedPosts):
-            XCTAssertTrue(receivedPosts.isEmpty)
-        case .failure:
-            XCTFail("Expected success got \(receivedResponse) instead")
-        }
+        expect(sut, toCompleteWith: expectedEmptyPosts, when: {
+            httpClientSpy.completeLoad(with: emptyData)
+        })
     }
     
     func test_load_completesWithPostsOnValidData() {
@@ -100,19 +93,11 @@ final class RemotePostLoaderTests: XCTestCase {
 
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
         
-        // When
-        let receivedResponse = loadResponseFor(sut, when: {
-            let data = try! JSONSerialization.data(withJSONObject: itemsJSON)
-            httpClientSpy.completeLoad(with: data)
-        })
-
         // Then
-        switch receivedResponse {
-        case .success(let receivedPosts):
-            XCTAssertEqual(receivedPosts, expectedPosts)
-        case .failure:
-            XCTFail("Expected success got \(receivedResponse) instead")
-        }
+        expect(sut, toCompleteWith: expectedPosts, when: {
+            let dataJSON = try! JSONSerialization.data(withJSONObject: itemsJSON)
+            httpClientSpy.completeLoad(with: dataJSON)
+        })
     }
     
     // MARK: Helpers
@@ -124,6 +109,22 @@ final class RemotePostLoaderTests: XCTestCase {
     
     private func anyURL() -> URL {
         URL(string: "any-url.com")!
+    }
+    
+    private func expect(_ sut: PostLoader,
+                        toCompleteWith expectedPosts: [Post],
+                        when action: () -> Void,
+                        file: StaticString = #filePath,
+                        line: UInt = #line) {
+        
+        let receivedResponse = loadResponseFor(sut, when: action)
+        
+        switch receivedResponse {
+        case .success(let receivedPosts):
+            XCTAssertEqual(receivedPosts, expectedPosts, file: file, line: line)
+        case .failure:
+            XCTFail("Expected success got \(receivedResponse) instead", file: file, line: line)
+        }
     }
     
     private func loadResponseFor(_ sut: PostLoader, when action: () -> Void) -> Result<[Post], Error> {
