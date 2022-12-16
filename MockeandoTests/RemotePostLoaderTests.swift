@@ -48,7 +48,7 @@ final class RemotePostLoaderTests: XCTestCase {
     }
     
     func test_load_completesWithEmptyOnEmptyDataResponse() {
-        let emptyPosts = [Post]()
+        let emptyPosts = Data("[]".utf8)
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
         
         let exp = expectation(description: "wait for completion")
@@ -62,7 +62,37 @@ final class RemotePostLoaderTests: XCTestCase {
             exp.fulfill()
         }
         
-        let data = try! JSONSerialization.data(withJSONObject: emptyPosts)
+        httpClientSpy.completeLoad(with: emptyPosts)
+        
+        wait(for: [exp], timeout: 0.5)
+    }
+    
+    func test_load_completesWithPostsOnValidData() {
+        let post = Post(userId: 0, id: 0, title: "a title", body: "a body")
+        let postJSON: [String: Any] = [
+            "userId": post.userId,
+            "id": post.id,
+            "title": post.title,
+            "body": post.body
+        ]
+        
+        let itemsJSON = [postJSON]
+        let expectedPosts = [post]
+
+        let (sut, httpClientSpy) = makeSUT(url: anyURL())
+        
+        let exp = expectation(description: "wait for completion")
+        sut.load { response in
+            switch response {
+            case .success(let receivedPosts):
+                XCTAssertEqual(receivedPosts, expectedPosts)
+            case .failure:
+                XCTFail("Expected success got \(response) instead")
+            }
+            exp.fulfill()
+        }
+        
+        let data = try! JSONSerialization.data(withJSONObject: itemsJSON)
         httpClientSpy.completeLoad(with: data)
         
         wait(for: [exp], timeout: 0.5)
@@ -89,7 +119,6 @@ final class RemotePostLoaderTests: XCTestCase {
         }
         
         // MARK: Helpers
-        
         func completeLoad(with error: NSError, at index: Int = 0) {
             completions[index](nil, error)
         }

@@ -21,8 +21,27 @@ public class RemotePostLoader: PostLoader {
             if let error = error {
                 completion(.failure(error))
             } else {
-                completion(.success([]))
+                do {
+                    let decoded = try JSONDecoder().decode([Payload].self, from: data ?? Data())
+                    completion(.success(self.map(payload: decoded)))
+                } catch {
+                    
+                }
             }
         }
+    }
+    
+    private func map(payload: [Payload]) -> [Post] {
+        payload.map { Post(userId: $0.userId,
+                           id: $0.id,
+                           title: $0.title,
+                           body: $0.body) }
+    }
+    
+    private struct Payload: Codable {
+        let userId: Int
+        let id: Int
+        let title: String
+        let body: String
     }
 }
