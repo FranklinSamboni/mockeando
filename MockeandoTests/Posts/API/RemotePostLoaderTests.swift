@@ -49,7 +49,7 @@ final class RemotePostLoaderTests: XCTestCase {
     func test_load_completesWithErrorOnInvalidData() {
         // Given
         let invalidJSON = Data("Invalid JSON".utf8)
-        let expectedError = RemotePostLoader.LoaderError.invalidData
+        let expectedError = RemoteLoader.LoaderError.invalidData
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
         
         // When
@@ -62,7 +62,7 @@ final class RemotePostLoaderTests: XCTestCase {
         case .success:
             XCTFail("Expected failure got \(receivedResponse) instead")
         case let .failure(receivedError):
-            XCTAssertEqual(receivedError as! RemotePostLoader.LoaderError, expectedError)
+            XCTAssertEqual(receivedError as! RemoteLoader.LoaderError, expectedError)
         }
     }
     
@@ -103,7 +103,7 @@ final class RemotePostLoaderTests: XCTestCase {
     // MARK: Helpers
     private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (PostLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
-        let sut = RemotePostLoader(httpClient: httpClienSpy, url: url)
+        let sut = RemoteLoader(httpClient: httpClienSpy, url: url)
         
         trackForMemoryLeak(sut, file: file, line: line)
         trackForMemoryLeak(httpClienSpy, file: file, line: line)

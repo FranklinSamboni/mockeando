@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class RemotePostLoader: PostLoader {
+public class RemoteLoader {
     private let httpClient: HTTPClient
     private let url: URL
     
@@ -16,14 +16,14 @@ public class RemotePostLoader: PostLoader {
         self.url = url
     }
     
-    public func load(completion: @escaping (Result<[Post], Error>) -> Void) {
+    func load<T>(tryMap mapper:  @escaping (Data) throws -> T, completion: @escaping (Result<T, Error>) -> Void) {
         httpClient.get(from: url) { [weak self] response in
             guard self != nil else { return }
             
             switch response {
             case let .success(data):
                 do {
-                    let posts = try PostAPIMapper.map(data)
+                    let posts = try mapper(data)
                     completion(.success(posts))
                 } catch {
                     completion(.failure(LoaderError.invalidData))
@@ -36,27 +36,5 @@ public class RemotePostLoader: PostLoader {
     
     public enum LoaderError: Error {
         case invalidData
-    }
-}
-
-class PostAPIMapper {
-    static func map(_ data: Data) throws -> [Post] {
-        let decoded = try JSONDecoder().decode([Payload].self, from: data)
-        let posts = Self.map(payload: decoded)
-        return posts
-    }
-    
-    private static func map(payload: [Payload]) -> [Post] {
-        payload.map { Post(userId: $0.userId,
-                           id: $0.id,
-                           title: $0.title,
-                           body: $0.body) }
-    }
-    
-    private struct Payload: Codable {
-        let userId: Int
-        let id: Int
-        let title: String
-        let body: String
     }
 }
