@@ -31,7 +31,7 @@ final class PostDetailsPresenderAdaterTests: XCTestCase {
     func test_load_completesDataOnSucceed() throws {
         let (sut, postLoader, commentsLoader, userLoader) = makeSUT()
         
-        let post = Post(userId: 0, id: 0, title: "title", body: "body")
+        let post = Post(userId: 0, id: 0, title: "title", body: "body", isFavorite: false)
         postLoader.stub = .success(post)
         
         let comments = [PostComment(id: 0, postId: 0, name: "name", email: "email", body: "body")]

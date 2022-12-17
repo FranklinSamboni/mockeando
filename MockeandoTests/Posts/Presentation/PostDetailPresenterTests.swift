@@ -28,7 +28,8 @@ final class PostDetailPresenterTests: XCTestCase {
         let post = Post(userId: 10,
                         id: 10,
                         title: "Expected title",
-                        body: "Expected body")
+                        body: "Expected body",
+                        isFavorite: false)
         let comment = PostComment(id: 20,
                                    postId: 20,
                                    name: "Expected name",

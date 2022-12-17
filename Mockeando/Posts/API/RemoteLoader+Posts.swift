@@ -40,7 +40,8 @@ private enum PostAPIMapper {
         Post(userId: item.userId,
              id: item.id,
              title: item.title,
-             body: item.body)
+             body: item.body,
+             isFavorite: false)
     }
     
     private struct Payload: Codable {

@@ -68,7 +68,7 @@ final class RemotePostLoaderTests: XCTestCase {
     
     func test_load_completesWithPostOnValidData() {
         // Given
-        let post = Post(userId: 0, id: 0, title: "a title", body: "a body")
+        let post = Post(userId: 0, id: 0, title: "a title", body: "a body", isFavorite: false)
         let postJSON: [String: Any] = [
             "userId": post.userId,
             "id": post.id,

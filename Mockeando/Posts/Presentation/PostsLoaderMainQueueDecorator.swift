@@ -15,8 +15,10 @@ class PostsLoaderMainQueueDecorator: PostsLoader {
     }
     
     func load(completion: @escaping (Response) -> Void) {
-        DispatchQueue.main.async { [weak self] in
-            self?.decorator.load(completion: completion)
+        decorator.load { response in
+            DispatchQueue.main.async {
+                completion(response)
+            }
         }
     }
 }
