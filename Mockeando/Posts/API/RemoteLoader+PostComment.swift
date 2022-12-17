@@ -7,8 +7,8 @@
 
 import Foundation
 
-extension RemoteLoader: PostCommentLoader {
-    public func load(completion: @escaping (PostCommentLoader.Response) -> Void) {
+extension RemoteLoader: PostCommentsLoader {
+    public func load(completion: @escaping (PostCommentsLoader.Response) -> Void) {
         load(tryMap: PostCommentAPIMapper.map(_:), completion: completion)
     }
     

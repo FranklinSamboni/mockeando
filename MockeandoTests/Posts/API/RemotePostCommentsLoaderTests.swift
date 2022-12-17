@@ -1,5 +1,5 @@
 //
-//  RemotePostCommentLoaderTests.swift
+//  RemotePostCommentsLoaderTests.swift
 //  MockeandoTests
 //
 //  Created by Franklin Samboni on 17/12/22.
@@ -8,7 +8,7 @@
 import XCTest
 import Mockeando
 
-final class RemotePostCommentLoaderTests: XCTestCase {
+final class RemotePostCommentsLoaderTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
         let (_, httpClientSpy) = makeSUT(url: anyURL())
@@ -102,7 +102,7 @@ final class RemotePostCommentLoaderTests: XCTestCase {
     }
     
     // MARK: Helpers
-    private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (PostCommentLoader, HTTPClientSpy) {
+    private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (PostCommentsLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemoteLoader(httpClient: httpClienSpy, url: url)
         
@@ -116,7 +116,7 @@ final class RemotePostCommentLoaderTests: XCTestCase {
         URL(string: "any-url.com")!
     }
     
-    private func expect(_ sut: PostCommentLoader,
+    private func expect(_ sut: PostCommentsLoader,
                         toCompleteWith expectedComments: [PostComment],
                         when action: () -> Void,
                         file: StaticString = #filePath,
@@ -132,7 +132,7 @@ final class RemotePostCommentLoaderTests: XCTestCase {
         }
     }
     
-    private func loadResponseFor(_ sut: PostCommentLoader, when action: () -> Void) -> Result<[PostComment], Error> {
+    private func loadResponseFor(_ sut: PostCommentsLoader, when action: () -> Void) -> Result<[PostComment], Error> {
         let exp = expectation(description: "wait for completion")
         
         var receivedResponse: Result<[PostComment], Error>!

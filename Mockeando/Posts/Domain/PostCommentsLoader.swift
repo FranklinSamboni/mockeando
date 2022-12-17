@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol PostCommentLoader {
+public protocol PostCommentsLoader {
     typealias Response = Result<[PostComment], Error>
     
     func load(completion: @escaping (Response) -> Void)

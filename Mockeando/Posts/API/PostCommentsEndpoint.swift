@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum PostCommentEndpoint {
+public enum PostCommentsEndpoint {
     case get(id: String)
 
     public func url(baseURL: URL) -> URL {
