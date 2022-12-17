@@ -14,7 +14,7 @@ public struct PostComment: Equatable {
     public let email: String
     public let body: String
     
-    init(id: Int, postId: Int, name: String, email: String, body: String) {
+    public init(id: Int, postId: Int, name: String, email: String, body: String) {
         self.id = id
         self.postId = postId
         self.name = name
@@ -22,3 +22,5 @@ public struct PostComment: Equatable {
         self.body = body
     }
 }
+
+

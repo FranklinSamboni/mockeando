@@ -8,7 +8,7 @@
 import Foundation
 
 extension RemoteLoader: PostLoader {
-    public func load(completion: @escaping (Response) -> Void) {
+    public func load(completion: @escaping (PostLoader.Response) -> Void) {
         load(tryMap: PostAPIMapper.map(_:), completion: completion)
     }
     

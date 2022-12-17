@@ -1,14 +1,14 @@
 //
-//  RemotePostLoaderTests.swift
+//  RemoteUserLoaderTests.swift
 //  MockeandoTests
 //
-//  Created by Franklin Samboni on 15/12/22.
+//  Created by Franklin Samboni on 17/12/22.
 //
 
 import XCTest
 import Mockeando
 
-final class RemotePostLoaderTests: XCTestCase {
+final class RemoteUserLoaderTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
         let (_, httpClientSpy) = makeSUT(url: anyURL())
@@ -66,42 +66,37 @@ final class RemotePostLoaderTests: XCTestCase {
         }
     }
     
-    func test_load_completesWithEmptyOnEmptyDataResponse() {
+    func test_load_completesWithUserOnValidData() {
         // Given
-        let emptyData = Data("[]".utf8)
-        let expectedEmptyPosts = [Post]()
-        let (sut, httpClientSpy) = makeSUT(url: anyURL())
-        
-        // Then
-        expect(sut, toCompleteWith: expectedEmptyPosts, when: {
-            httpClientSpy.completeLoad(with: emptyData)
-        })
-    }
-    
-    func test_load_completesWithPostsOnValidData() {
-        // Given
-        let post = Post(userId: 0, id: 0, title: "a title", body: "a body")
-        let postJSON: [String: Any] = [
-            "userId": post.userId,
-            "id": post.id,
-            "title": post.title,
-            "body": post.body
+        let user = User(id: 10, name: "a name", username: "a username", email: "a email", city: "a city", website: "a website", company: "a company")
+        let userJSON: [String: Any] = [
+            "id": user.id,
+            "name": user.name,
+            "username": user.username,
+            "email": user.email,
+            "address": ["street": "a stree",
+                        "suite": "a suite",
+                        "city": "a city",
+                        "zipcode": "a zipcode",
+                        "geo": ["lat": "a lat", "lng": "a lng"]],
+            "phone": "a phone",
+            "website": user.website,
+            "company": ["name": user.company,
+                        "catchPhrase": "a catchPhrase",
+                        "bs": "a bs"]
         ]
-        
-        let itemsJSON = [postJSON]
-        let expectedPosts = [post]
 
         let (sut, httpClientSpy) = makeSUT(url: anyURL())
         
         // Then
-        expect(sut, toCompleteWith: expectedPosts, when: {
-            let dataJSON = try! JSONSerialization.data(withJSONObject: itemsJSON)
+        expect(sut, toCompleteWith: user, when: {
+            let dataJSON = try! JSONSerialization.data(withJSONObject: userJSON)
             httpClientSpy.completeLoad(with: dataJSON)
         })
     }
     
     // MARK: Helpers
-    private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (PostLoader, HTTPClientSpy) {
+    private func makeSUT(url: URL, file: StaticString = #filePath, line: UInt = #line) -> (UserLoader, HTTPClientSpy) {
         let httpClienSpy = HTTPClientSpy()
         let sut = RemoteLoader(httpClient: httpClienSpy, url: url)
         
@@ -115,8 +110,8 @@ final class RemotePostLoaderTests: XCTestCase {
         URL(string: "any-url.com")!
     }
     
-    private func expect(_ sut: PostLoader,
-                        toCompleteWith expectedPosts: [Post],
+    private func expect(_ sut: UserLoader,
+                        toCompleteWith expectedUser: User,
                         when action: () -> Void,
                         file: StaticString = #filePath,
                         line: UInt = #line) {
@@ -124,17 +119,17 @@ final class RemotePostLoaderTests: XCTestCase {
         let receivedResponse = loadResponseFor(sut, when: action)
         
         switch receivedResponse {
-        case .success(let receivedPosts):
-            XCTAssertEqual(receivedPosts, expectedPosts, file: file, line: line)
+        case .success(let receivedUser):
+            XCTAssertEqual(receivedUser, expectedUser, file: file, line: line)
         case .failure:
             XCTFail("Expected success got \(receivedResponse) instead", file: file, line: line)
         }
     }
     
-    private func loadResponseFor(_ sut: PostLoader, when action: () -> Void) -> Result<[Post], Error> {
+    private func loadResponseFor(_ sut: UserLoader, when action: () -> Void) -> Result<User, Error> {
         let exp = expectation(description: "wait for completion")
         
-        var receivedResponse: Result<[Post], Error>!
+        var receivedResponse: Result<User, Error>!
         sut.load { response in
             receivedResponse = response
             exp.fulfill()
