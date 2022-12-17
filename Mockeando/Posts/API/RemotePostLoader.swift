@@ -18,13 +18,12 @@ public class RemotePostLoader: PostLoader {
     
     public func load(completion: @escaping (Result<[Post], Error>) -> Void) {
         httpClient.get(from: url) { [weak self] response in
-            guard let self = self else { return }
+            guard self != nil else { return }
             
             switch response {
             case let .success(data):
                 do {
-                    let decoded = try JSONDecoder().decode([Payload].self, from: data)
-                    let posts = self.map(payload: decoded)
+                    let posts = try PostAPIMapper.map(data)
                     completion(.success(posts))
                 } catch {
                     completion(.failure(LoaderError.invalidData))
@@ -35,7 +34,19 @@ public class RemotePostLoader: PostLoader {
         }
     }
     
-    private func map(payload: [Payload]) -> [Post] {
+    public enum LoaderError: Error {
+        case invalidData
+    }
+}
+
+class PostAPIMapper {
+    static func map(_ data: Data) throws -> [Post] {
+        let decoded = try JSONDecoder().decode([Payload].self, from: data)
+        let posts = Self.map(payload: decoded)
+        return posts
+    }
+    
+    private static func map(payload: [Payload]) -> [Post] {
         payload.map { Post(userId: $0.userId,
                            id: $0.id,
                            title: $0.title,
@@ -47,9 +58,5 @@ public class RemotePostLoader: PostLoader {
         let id: Int
         let title: String
         let body: String
-    }
-    
-    public enum LoaderError: Error {
-        case invalidData
     }
 }
