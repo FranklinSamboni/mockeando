@@ -40,7 +40,7 @@ Trying to follow CLEAN architecture concepts I ended up with the following struc
     - Presentation
     - UI
     
-Where domain abstractions does not have any dependency with any framework or module like Cache, API, Presentation or UI. 
+Where domain abstractions do not have any dependency with any framework or module like Cache, API, Presentation or UI. 
 The presentation layer does not depend on UIKit components, making it easily reusable with other framework like SwiftUI if needed,
 or even other platforms like macOS, iPad OS or WatchOS. 
 
