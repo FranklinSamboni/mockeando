@@ -136,6 +136,7 @@
 		2785025F294F6E2E00BEA288 /* PostAPIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostAPIMapper.swift; sourceTree = "<group>"; };
 		27850261294F6E4600BEA288 /* PostCommentAPIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCommentAPIMapper.swift; sourceTree = "<group>"; };
 		27850263294F6E7000BEA288 /* UserAPIMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAPIMapper.swift; sourceTree = "<group>"; };
+		27850265294F70BD00BEA288 /* Demo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = Demo.mp4; sourceTree = "<group>"; };
 		27C6B108294C164200A8C3B4 /* Mockeando.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mockeando.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		27C6B10B294C164200A8C3B4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		27C6B10D294C164200A8C3B4 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -354,6 +355,7 @@
 		27C6B0FF294C164200A8C3B4 = {
 			isa = PBXGroup;
 			children = (
+				27850265294F70BD00BEA288 /* Demo.mp4 */,
 				27C6B13D294C19A400A8C3B4 /* README.md */,
 				27C6B10A294C164200A8C3B4 /* Mockeando */,
 				27C6B121294C164400A8C3B4 /* MockeandoTests */,
