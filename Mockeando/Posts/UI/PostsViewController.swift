@@ -15,7 +15,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     @IBOutlet weak var selectAllBarButton: UIBarButtonItem!
     @IBOutlet weak var deleteButtonView: UIView!
     
-    var viewModel = PostsViewModel(items: [])
+    var viewModel = PostsViewModel(favorites: [], lists: [])
     
     var onLoad: (() -> Void)!
     
@@ -33,6 +33,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
         tableView.refreshControl = uiRefreshControl
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.1))
         
         editBarButton.title = PostsPresenter.edit
         selectAllBarButton.title = PostsPresenter.selectAll
@@ -58,7 +59,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
         for section in 0..<numberOfSections(in: tableView) {
             for row in 0..<tableView(tableView, numberOfRowsInSection: section) {
                 let indexPath = IndexPath(row: row, section: section)
-                if tableView(tableView, canEditRowAt: indexPath) {
+                if canEditRow(at: indexPath) {
                     tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
                 }
             }
@@ -69,8 +70,8 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
         let indexPaths = tableView.indexPathsForSelectedRows
         
         let items = indexPaths?.compactMap { indexPath in
-            if indexPath.row < viewModel.items.count {
-                return viewModel.items[indexPath.row]
+            if canEditRow(at: indexPath) {
+                return itemForSection(indexPath: indexPath)
             }
             return nil
         }
@@ -80,24 +81,40 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return PostsPresenter.lists
+        if section == 0 {
+            return PostsPresenter.favorites
+        } else {
+            return PostsPresenter.lists
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return viewModel.favorites.count > 0 ? 50 : 0
+        } else {
+            return viewModel.lists.count > 0 ? 50 : 0
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.items.count
+        if section == 0 {
+            return viewModel.favorites.count
+        } else {
+            return viewModel.lists.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! BasicTableViewCell
         
-        let item = viewModel.items[indexPath.row]
+        let item = itemForSection(indexPath: indexPath)
         cell.titleLabel.text = item.title
         
-        cell.selectionStyle = tableView.isEditing ? .default : .none
+        cell.selectionStyle = tableView.isEditing && canEditRow(at: indexPath) ? .default : .none
         return cell
     }
     
@@ -106,9 +123,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        let item = viewModel.items[indexPath.row]
-        
-        return !item.isFavorite
+        canEditRow(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
@@ -116,7 +131,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let item = viewModel.items[indexPath.row]
+        let item = itemForSection(indexPath: indexPath)
         
         let favoriteAction = UIContextualAction(style: .normal, title: PostsPresenter.favorite) { [weak self] action, view, completionHandler in
             self?.onFavorite?(item)
@@ -132,6 +147,18 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         let actions = item.isFavorite ? [unfavoriteAction] : [favoriteAction]
         return UISwipeActionsConfiguration(actions: actions)
+    }
+    
+    private func itemForSection(indexPath: IndexPath) -> PostViewModel {
+        let item = indexPath.section == 0 ? viewModel.favorites[indexPath.row] : viewModel.lists[indexPath.row]
+        return item
+    }
+    
+    private func canEditRow(at indexPath: IndexPath) -> Bool {
+        let item = itemForSection(indexPath: indexPath)
+        
+        let canEdit = !tableView.isEditing || (tableView.isEditing && !item.isFavorite)
+        return canEdit
     }
 }
 

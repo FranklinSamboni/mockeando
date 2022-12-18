@@ -26,7 +26,7 @@ final class PostsPresenterTests: XCTestCase {
         XCTAssertEqual(loadingViewSpy.receivedMessages, [isLoading(true)])
         
         let post = Post(userId: 0, id: 0, title: "expected title", body: "a body", isFavorite: false)
-        let expectedViewModel = PostsViewModel(items: [PostViewModel(title: "expected title", isFavorite: false)])
+        let expectedViewModel = PostsViewModel(favorites: [], lists: [PostViewModel(id: post.id, title: "expected title", isFavorite: false)])
         postsLoaderSpy.completeLoadWith(posts: [post])
         
         XCTAssertEqual(postsLoaderSpy.receivedMessages.count, 1)
@@ -55,21 +55,21 @@ final class PostsPresenterTests: XCTestCase {
                                                                                  postsView: PostsViewSpy,
                                                                                  errorViewSpy: ErrorViewSpy,
                                                                                  loadingViewSpy: LoadingViewSpy,
-                                                                                 postsLoaderSpy: PostsLoaderSpy) {
+                                                                                 adapter: PostsPresenterAdapterSpy) {
         let postsViewSpy = PostsViewSpy()
         let errorViewSpy = ErrorViewSpy()
         let loadingViewSpy = LoadingViewSpy()
-        let postsLoaderSpy = PostsLoaderSpy()
+        let adapterSpy = PostsPresenterAdapterSpy()
         
-        let sut = PostsPresenter(postsView: postsViewSpy, loadingView: loadingViewSpy, errorView: errorViewSpy, loader: postsLoaderSpy)
+        let sut = PostsPresenter(postsView: postsViewSpy, loadingView: loadingViewSpy, errorView: errorViewSpy, adapter: adapterSpy)
 
         trackForMemoryLeak(postsViewSpy, file: file, line: line)
         trackForMemoryLeak(errorViewSpy, file: file, line: line)
         trackForMemoryLeak(loadingViewSpy, file: file, line: line)
-        trackForMemoryLeak(postsLoaderSpy, file: file, line: line)
+        trackForMemoryLeak(adapterSpy, file: file, line: line)
         trackForMemoryLeak(sut, file: file, line: line)
         
-        return (sut, postsViewSpy, errorViewSpy, loadingViewSpy, postsLoaderSpy)
+        return (sut, postsViewSpy, errorViewSpy, loadingViewSpy, adapterSpy)
     }
     
     private func isLoading(_ bool: Bool) -> LoadingViewModel {

@@ -9,35 +9,65 @@ import Foundation
 
 public class PostsPresenter {
     
-    private let loader: PostsLoader
+    private let adapter: PostsPresenterAdapter
     private weak var postsView: PostsView?
     private weak var loadingView: LoadingView?
     private weak var errorView: ErrorView?
     
-    public init(postsView: PostsView, loadingView: LoadingView, errorView: ErrorView, loader: PostsLoader) {
+    public init(postsView: PostsView, loadingView: LoadingView, errorView: ErrorView, adapter: PostsPresenterAdapter) {
         self.postsView = postsView
         self.errorView = errorView
         self.loadingView = loadingView
-        self.loader = loader
+        self.adapter = adapter
+    }
+    
+    private func map(posts: [Post]) -> PostsViewModel {
+        let favorites = posts.filter{ $0.isFavorite }.map { PostViewModel(id: $0.id, title: $0.title, isFavorite: $0.isFavorite) }
+        let lists = posts.filter{ !$0.isFavorite }.map { PostViewModel(id: $0.id, title: $0.title, isFavorite: $0.isFavorite) }
+        return PostsViewModel(favorites: favorites, lists: lists)
     }
     
     public func load() {
         loadingView?.display(LoadingViewModel(isLoading: true))
         
-        loader.load { [weak self] response in
+        adapter.load { [weak self] response in
             guard let self = self else { return }
             
             self.loadingView?.display(LoadingViewModel(isLoading: false))
             
             switch response {
             case let .success(posts):
-                let items = posts.map { PostViewModel(title: $0.title, isFavorite: $0.isFavorite) }
-                let viewModel = PostsViewModel(items: items)
+                let viewModel = self.map(posts: posts)
                 self.postsView?.display(viewModel)
             case .failure:
                 let error = ErrorViewModel(message: "Ups, something went wrong")
                 self.errorView?.display(error)
             }
+        }
+    }
+    
+    public func onFavorite(item: PostViewModel) {
+        adapter.onFavorite(item: item)
+        refreshFromLocal()
+    }
+    
+    public func onUnfavorite(item: PostViewModel) {
+        adapter.onUnfavorite(item: item)
+        refreshFromLocal()
+    }
+    
+    public func onDelete(items: [PostViewModel]) {
+        adapter.onDelete(items: items) { [weak self] response in
+            self?.refreshFromLocal()
+        }
+    }
+    
+    private func refreshFromLocal() {
+        adapter.loadFromLocal { [weak self] response in
+            guard let self = self,
+                  let posts = try? response.get() else { return }
+            let viewModel = self.map(posts: posts)
+            self.postsView?.display(viewModel)
         }
     }
 }
@@ -52,4 +82,5 @@ extension PostsPresenter {
     static let edit = "Edit"
     static let cancel = "Cancel"
     static let selectAll = "Select All"
+    static let favorites = "★ Favorites"
 }

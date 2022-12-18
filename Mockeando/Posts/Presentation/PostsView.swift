@@ -12,18 +12,22 @@ public protocol PostsView: AnyObject {
 }
 
 public struct PostsViewModel: Equatable {
-    public let items: [PostViewModel]
+    public let favorites: [PostViewModel]
+    public let lists: [PostViewModel]
     
-    public init(items: [PostViewModel]) {
-        self.items = items
+    public init(favorites: [PostViewModel], lists: [PostViewModel]) {
+        self.favorites = favorites
+        self.lists = lists
     }
 }
 
 public struct PostViewModel: Equatable {
+    public let id: Int
     public let title: String
     public let isFavorite: Bool
     
-    public init(title: String, isFavorite: Bool) {
+    public init(id: Int, title: String, isFavorite: Bool) {
+        self.id = id
         self.title = title
         self.isFavorite = isFavorite
     }

@@ -6,14 +6,22 @@
 //
 
 import UIKit
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
     
-    let baseURL = URL(string: "https://jsonplaceholder.typicode.com")!
-    let httpClient = URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
-
+    private let baseURL = URL(string: "https://jsonplaceholder.typicode.com")!
+    private lazy var httpClient: HTTPClient = {
+        URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
+    }()
+    
+    private lazy var store: CoreDataStore = {
+        let storeURL = NSPersistentContainer.defaultDirectoryURL().appendingPathComponent("feed-store.sqlite")
+        return try! CoreDataStore(storeURL: storeURL)
+    }()
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         
@@ -21,18 +29,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let rootViewController = UINavigationController()
         
-
-        
         rootViewController.viewControllers = [composePostsFeature()]
         window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
     }
 
-    
     private func composePostsFeature() -> UIViewController {
         let endpointURL = PostsEndpoint.get.url(baseURL: baseURL)
-        let postsLoader = RemoteLoader(httpClient: httpClient, url: endpointURL)
-        let mainQueueLoader = PostsLoaderMainQueueDecorator(decorator: postsLoader)
+        let remoteLoader = RemoteLoader(httpClient: httpClient, url: endpointURL)
+        let adapter = PostsPresenterAdapter(remoteLoader: remoteLoader, localLoader: store, postCache: store)
         
         let storyboard = UIStoryboard(name: "Posts", bundle: .main)
         let postsViewController = storyboard.instantiateInitialViewController() as! PostsViewController
@@ -40,20 +45,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let presenter = PostsPresenter(postsView: postsViewController,
                                        loadingView: postsViewController,
                                        errorView: postsViewController,
-                                       loader: mainQueueLoader)
+                                       adapter: adapter)
         
         postsViewController.onLoad = presenter.load
-        postsViewController.onFavorite = { item in
-            
-        }
-        
-        postsViewController.onUnfavorite = { item in
-            
-        }
-        
-        postsViewController.onDeleteItems = { items in
-            
-        }
+        postsViewController.onFavorite = presenter.onFavorite
+        postsViewController.onUnfavorite = presenter.onUnfavorite
+        postsViewController.onDeleteItems = presenter.onDelete
         
         return postsViewController
     }
