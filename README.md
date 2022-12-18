@@ -55,4 +55,13 @@ or even other platforms like macOS, iPad OS or WatchOS.
 8. From here my recommendations is to start looking the modules in the following order, Domain -> API -> Cache -> Presentation -> UI
 9. Look at the UTs structure when reviewing API and Presentation layers. 
  
- 
+ ## Frameworks
+ - UIKit
+ - CoreData
+ - Foundation
+ - XCTest
+
+## Xcode
+ - Project built with 14.0.1 xcode version
+
+Note: There is not external depedencies
