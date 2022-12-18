@@ -46,9 +46,7 @@ final class PostDetailPresenterTests: XCTestCase {
         
         let expectedViewModel = PostDetailViewModel(title: post.title,
                                                     body: post.body,
-                                                    author: user.username,
-                                                    location: user.city,
-                                                    website: user.website,
+                                                    authorInfo: "\(user.username)\nCity: \(user.city)\nwebsite: \(user.website)",
                                                     comments: [PostCommentViewModel(author: comment.email,
                                                                                     title: comment.name,
                                                                                     description: comment.body)])

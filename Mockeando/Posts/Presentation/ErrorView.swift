@@ -13,8 +13,12 @@ public protocol ErrorView: AnyObject {
 
 public struct ErrorViewModel: Equatable {
     public let message: String
+    public let title: String
+    public let buttonTitle: String
     
-    public init(message: String) {
+    init(message: String, title: String, buttonTitle: String) {
         self.message = message
+        self.title = title
+        self.buttonTitle = buttonTitle
     }
 }

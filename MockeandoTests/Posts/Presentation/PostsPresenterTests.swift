@@ -26,7 +26,7 @@ final class PostsPresenterTests: XCTestCase {
         XCTAssertEqual(loadingViewSpy.receivedMessages, [isLoading(true)])
         
         let post = Post(userId: 0, id: 0, title: "expected title", body: "a body", isFavorite: false)
-        let expectedViewModel = PostsViewModel(favorites: [], lists: [PostViewModel(id: post.id, title: "expected title", isFavorite: false)])
+        let expectedViewModel = PostsViewModel(favorites: [], lists: [PostViewModel(id: post.id, userId: post.userId, title: "expected title", isFavorite: false)])
         postsLoaderSpy.completeLoadWith(posts: [post])
         
         XCTAssertEqual(postsLoaderSpy.receivedMessages.count, 1)

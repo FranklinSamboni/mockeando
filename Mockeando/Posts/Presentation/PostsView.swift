@@ -23,11 +23,13 @@ public struct PostsViewModel: Equatable {
 
 public struct PostViewModel: Equatable {
     public let id: Int
+    public let userId: Int
     public let title: String
     public let isFavorite: Bool
     
-    public init(id: Int, title: String, isFavorite: Bool) {
+    public init(id: Int, userId: Int, title: String, isFavorite: Bool) {
         self.id = id
+        self.userId = userId
         self.title = title
         self.isFavorite = isFavorite
     }

@@ -21,9 +21,13 @@ public class PostsPresenter {
         self.adapter = adapter
     }
     
+    private func map(post: Post) -> PostViewModel {
+        PostViewModel(id: post.id, userId: post.userId, title: post.title, isFavorite: post.isFavorite)
+    }
+    
     private func map(posts: [Post]) -> PostsViewModel {
-        let favorites = posts.filter{ $0.isFavorite }.map { PostViewModel(id: $0.id, title: $0.title, isFavorite: $0.isFavorite) }
-        let lists = posts.filter{ !$0.isFavorite }.map { PostViewModel(id: $0.id, title: $0.title, isFavorite: $0.isFavorite) }
+        let favorites = posts.filter{ $0.isFavorite }.map { map(post: $0) }
+        let lists = posts.filter{ !$0.isFavorite }.map { map(post: $0) }
         return PostsViewModel(favorites: favorites, lists: lists)
     }
     
@@ -40,7 +44,9 @@ public class PostsPresenter {
                 let viewModel = self.map(posts: posts)
                 self.postsView?.display(viewModel)
             case .failure:
-                let error = ErrorViewModel(message: "Ups, something went wrong")
+                let error = ErrorViewModel(message: PostsPresenter.errorMessage,
+                                           title: PostsPresenter.errorTitle,
+                                           buttonTitle: PostsPresenter.ok)
                 self.errorView?.display(error)
             }
         }
@@ -83,4 +89,5 @@ extension PostsPresenter {
     static let cancel = "Cancel"
     static let selectAll = "Select All"
     static let favorites = "★ Favorites"
+    static let errorMessage = "Ups, something went wrong"
 }

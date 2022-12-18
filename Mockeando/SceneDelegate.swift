@@ -22,14 +22,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         return try! CoreDataStore(storeURL: storeURL)
     }()
     
+    private lazy var rootViewController: UINavigationController = {
+        let nav = UINavigationController()
+        nav.viewControllers = [composePostsFeature()]
+        return nav
+    }()
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: scene)
-        
-        let rootViewController = UINavigationController()
-        
-        rootViewController.viewControllers = [composePostsFeature()]
         window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
     }
@@ -51,8 +53,43 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         postsViewController.onFavorite = presenter.onFavorite
         postsViewController.onUnfavorite = presenter.onUnfavorite
         postsViewController.onDeleteItems = presenter.onDelete
+        postsViewController.onClick = { [weak self] postId, userId in
+            self?.showDetail(postId: postId, userId: userId)
+        }
         
         return postsViewController
+    }
+    
+    private func showDetail(postId: Int, userId: Int) {
+        let viewController = composePostDetailFeature(postId: postId, userId: userId)
+        rootViewController.pushViewController(viewController, animated: true)
+    }
+    
+    private func composePostDetailFeature(postId: Int, userId: Int) -> UIViewController {
+        let postURL = PostsEndpoint.getBy(id: String(postId)).url(baseURL: baseURL)
+        let postRemoteLoader = RemoteLoader(httpClient: httpClient, url: postURL)
+        
+        let commentsURL = PostCommentsEndpoint.get(id: String(postId)).url(baseURL: baseURL)
+        let commentsRemoteLoader = RemoteLoader(httpClient: httpClient, url: commentsURL)
+        
+        let userURL = UserEndpoint.get(id: String(userId)).url(baseURL: baseURL)
+        let userRemoteLoader = RemoteLoader(httpClient: httpClient, url: userURL)
+        
+        let adapter = PostDetailsPresenderAdater(postLoader: postRemoteLoader,
+                                                 commentsLoader: commentsRemoteLoader,
+                                                 userLoader: userRemoteLoader)
+        
+        let storyboard = UIStoryboard(name: "PostDetail", bundle: .main)
+        let detailViewController = storyboard.instantiateInitialViewController() as! PostDetailViewController
+
+        let presenter = PostDetailPresenter(detailView: detailViewController,
+                                            loadingView: detailViewController,
+                                            errorView: detailViewController,
+                                            adapter: adapter)
+        
+        detailViewController.onLoad = presenter.load
+        
+        return detailViewController
     }
 }
 

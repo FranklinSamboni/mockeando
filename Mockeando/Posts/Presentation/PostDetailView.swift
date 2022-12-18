@@ -14,17 +14,13 @@ public protocol PostDetailView: AnyObject {
 public struct PostDetailViewModel: Equatable {
     public let title: String
     public let body: String
-    public let author: String
-    public let location: String
-    public let website: String
+    public let authorInfo: String
     public let comments: [PostCommentViewModel]
     
-    public init(title: String, body: String, author: String, location: String, website: String, comments: [PostCommentViewModel]) {
+    public init(title: String, body: String, authorInfo: String, comments: [PostCommentViewModel]) {
         self.title = title
         self.body = body
-        self.author = author
-        self.location = location
-        self.website = website
+        self.authorInfo = authorInfo
         self.comments = comments
     }
 }

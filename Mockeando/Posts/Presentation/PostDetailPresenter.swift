@@ -35,13 +35,11 @@ public class PostDetailPresenter {
                                                                             description: $0.body) }
                 let viewModel = PostDetailViewModel(title: post.title,
                                                     body: post.body,
-                                                    author: user.username,
-                                                    location: user.city,
-                                                    website: user.website,
+                                                    authorInfo: "\(user.username)\nCity: \(user.city)\nwebsite: \(user.website)",
                                                     comments: commentsViewModel)
                 self.detailView?.display(viewModel)
             case .failure:
-                let error = ErrorViewModel(message: "Ups, something went wrong")
+                let error = ErrorViewModel(message: "Ups, something went wrong", title: "Error", buttonTitle: "OK")
                 self.errorView?.display(error)
             }
         }

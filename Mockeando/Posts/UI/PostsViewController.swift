@@ -22,6 +22,7 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     var onFavorite: ((PostViewModel) -> Void)?
     var onUnfavorite: ((PostViewModel) -> Void)?
     var onDeleteItems: (([PostViewModel]) -> Void)?
+    var onClick: ((Int, Int) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -119,7 +120,10 @@ class PostsViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard !tableView.isEditing else { return }
         
+        let item = itemForSection(indexPath: indexPath)
+        onClick?(item.id, item.userId)
     }
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -171,8 +175,8 @@ extension PostsViewController: PostsView {
 
 extension PostsViewController: ErrorView {
     func display(_ viewModel: ErrorViewModel) {
-        let alert = UIAlertController(title: PostsPresenter.errorTitle, message: viewModel.message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: PostsPresenter.ok, style: .default))
+        let alert = UIAlertController(title: viewModel.title, message: viewModel.message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: viewModel.buttonTitle, style: .default))
         
         present(alert, animated: true)
     }
